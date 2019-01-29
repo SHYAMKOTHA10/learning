@@ -46,27 +46,7 @@ Script from bundle: service stop
 once the deployement parameters filled and save the service file.
 
 
-## Service Accout for project in Google Cloud:
-#
-Download the Account Service Json file from the Google cloud
-Home --> IAM & admin --> Service accounts --> <cloudcentersuitedemo@c3beta-poc-m1yx.iam.gserviceaccount.com> --> From Action 
-create key --> JSON (Key type)
 
-
-
-# Sample json file:
-{
-  "type": "service_account",
-  "project_id": "c3beta-poc-m1yx",
-  "private_key_id": "9cea68313c83527d0e65d32dfde644c7a1cbe012",
-  "private_key": "-----BEGIN PRIVATE KEY-----\n<xxxxx> \n-----END PRIVATE KEY-----\n",
-  "client_email": "cloudcentersuitedemo@c3beta-poc-m1yx.iam.gserviceaccount.com",
-  "client_id": "115521479903043284569",
-  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
-  "token_uri": "https://oauth2.googleapis.com/token",
-  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
-  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cloudcentersuitedemo%40c3beta-poc-m1yx.iam.gserviceaccount.com"
-}
 
 ## App Profile Modeling.
 
