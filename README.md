@@ -1,142 +1,103 @@
-# Introduction
+# Google Load Balancer Integration units:
+## Introduction:
+    Cisco Cloud Center (version 5.0 and later) extends its support with Google Load Balancer (LB) through this Integration Unit (IU) for setup,start and stop. This LB Google IU leverage Google REST APIs to create and delete LBs dynamically.
+# Service Installation:
+    login to CloudCenter as an administrator and click on Admin--> Services --> Add service
+    
+    Service Type: External Service
+    
+    Service logo: Downlad logo from : <location of logo path>
+    
+    Name: Google ELB
+    
+    Service ID: gelb
+    
+    Description: Service for Google Load Balancer
+    
+    Category: Load Balancer or custome service
+    
+# External Lifecycle Actions:
+    External Action Bundle:  URL 
+    
+    URL : http://35.154.153.188/gelb/gelb.zip<location of gelb.zip> 
+    
+    Download the Google Load Balancer Service Bundle : http://35.154.153.188/gelb/gelb.zip
+    To add the Google Load Balancer service login to CloudCenter as an administrator and click on Admin -> Services -> Add Service. The information below should be used to create the Google service.
+    
+    
+    
+    
+    
+# External Lifecycle Actions:
+External Action Bundle: 
+URL : http://35.154.153.188/gelb/gelb.zip<location of gelb.zip> 
+Start:
+Script from bundle: service start
+Stop:
+Script from bundle: service stop
+# Deployement Parameters:
+| Parameter Name	| Type	 | Description | Allowed Value |Default Value |
+| ------ | ------ | ------ |------ | ------ |
+| gelbProjectname | string | The project id where the service need to be deployed.| <samplename> |  |
+| gelbLoadBalancerType |	List |	Type of Load Balancer. For more details on the type of load balancer to choose, check Google cloud documentation | TCP / HTTP / UDP | 
+|gelbInstances | String | Comma separated instance names to be configured for the service. Ensure the configured health check path is  available and is responding in all the specified instances for the configured health check to pass
+| gelbHealthCheck |	String |	The health check name to be configured for the service. | 
+
+once the deployement parameters filled and save the service file.
 
 
-The CloudCenter platform supports integration to various Load Balancers. This document provides information on integration with F5 by creating an external service in CloudCenter.
+## Service Accout for project in Google Cloud:
+#
+Download the Account Service Json file from the Google cloud
+Home --> IAM & admin --> Service accounts --> <cloudcentersuitedemo@c3beta-poc-m1yx.iam.gserviceaccount.com> --> From Action 
+create key --> JSON (Key type)
 
 
 
-F5 BIG-IP provides a wide range of application delivery services, such as server load balancing (SLB), L4-L7 firewall and SSL VPN. With the use of iApps and rich foundation of F5 API, Cisco Cloud Center can deploy F5 virtual servers to provide SLB, FW and SSL VPN services to the applications.
+# Sample json file:
+{
+  "type": "service_account",
+  "project_id": "c3beta-poc-m1yx",
+  "private_key_id": "9cea68313c83527d0e65d32dfde644c7a1cbe012",
+  "private_key": "-----BEGIN PRIVATE KEY-----\n<xxxxx> \n-----END PRIVATE KEY-----\n",
+  "client_email": "cloudcentersuitedemo@c3beta-poc-m1yx.iam.gserviceaccount.com",
+  "client_id": "115521479903043284569",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/cloudcentersuitedemo%40c3beta-poc-m1yx.iam.gserviceaccount.com"
+}
 
-Cisco Cloud Center will maintain the application services catalog, provide consistent and agile L4-L7 services to application deployment in both private and public cloud environments.
+## App Profile Modeling.
 
-# Prerequisites
+1. From App profile select --> MODEL --> N- Tier Execution --> Service --> Custom service --> <select load balancer and drag and drop to topology model>
+2. From Web server -<Select webserver drag and drop>
+3. Connect webserver from Google load balancer 
 
+And save App profile with <AppName>
 
-#####  CloudCenter
-- CloudCenter 4.8 and above
-- Knowledge on how to use CloudCenter
-##### F5 BIG-IP
-- Release 12.1.x
-- Download App Services iApps 2.0 from GitHub and import into BIG-IP
-- BIG-IP management interface must be configured and reachable by Cloud Center
-- BIG-IP must be licensed
+## Deployments
 
-
-# Service Package Bundle
+From Deployment page select --> New Deployment and Select the App profile 
+Start to Deploy with required Deployement parameters.
 
 
 The Packer Service bundle consists of the following files:
 
 
-- **service** - The main script that has the logic for the integration
-- **serviceDictionary.csv**  - The dictionary CSV file that has the list of all the parameters and their defaults. If you want to get addition input from the user, they need to be added to this file and also in the UI. The format of this file is as follows:
-  -  DisplayName,paramName,paramType,defaultValue,visible,optional
-  - e.g. Root Volume Size,root_volume_size,10,Y,N
-      The parameter name is key here and should match the parameter name in the UI
 
-- **bigip_rest.py** - script that calls the F5 APIs. This python script is called from the main **service** script
-- **cliqr.template** - F5 template file use by bigip_rest.py
+# Shell script:
+ - service: Initiates the python script to start integration.
 
+# Python script :
+ - install_setup.py: The script will installs necessary python packages also invokes external life cycle action.
+- google_load_balancer.py: This script will have all lifecycle actions and checking required parameter from the Environment. It involves the creation and deletion of google load balancer using Google Api python client SDK
 
-# Service Description
+ - google_management.py: Script that invokes the main method in google load balancer to 
+ - common.py: This script contains common functionalities which is required for other script files.
+ - util.py: utility file
+ - error_utils.py: A script that handles error functionalities
+ 
 
-To add this service login to CloudCenter as an administrator and click on Admin->Services->Add Service. Use the information listed below to create the service.
-
-**Service Type**: External Service
-
-**Name**: F5-LB
-
-**Service ID**: f5lb
-
-**Description**: F5 Load Balancer
-
-**Category**: Load Balancer
-
-#### External Lifecycle Actions:
-
-
-
-External Action Bundle: <**location of f5lb.zip**>
-
-Update:
-     Script from Bundle: **service update**
-
-Start:
-     Script from Bundle: **service start**
-
-Stop:
-     Script from Bundle: **service stop**
-
-
-
-#### Service Parameters
-
-|Parameter Name|	bigIPAddress|
-|:--------------|:------------|
-| Display Name |IP Address of BIG-IP |
-|Type	| string                               |
-|Default Value | 	|
-|User Options | 	 |
-|Parameter Name	| bigIPuser |
-|Display Name|  	User Name for BIG IP      |
-|Type	| string |
-|Default Value	| admin |
-|User Options	 |  |
-|Parameter Name	| bigIPPassword |
-|Display Name	  | Password for BIG-IP|
-|Type	         | password |
-|Default Value |          | 	
-|User Options	 |          |
-
-#### Deployment Parameters
-
-|Parameter Name|	pool__addr  |
-|:-------------|:-------------|
-|Display Name  | Virtual Server Address |
-|Type	|string|
-|Default Value	| |
-|User Options	|Visible, Editable|
-
-
-
-|Parameter Name |	name           |
-|:--------------|:--------------|
-|Display Name   |                |               
-|Application Services Name |     |                  
-|Type	string               |     |
-|Default Value             |     |	
-|User Options |	Visible, Editable|
-
-
-|Parameter Name |	pool__port      |
-|:--------------|:----------------|
-|Display Name	 | VIP Pool Port    |
-|Type          |	string          |
-|Default Value |	80              |
-|User Options	| Visible, Editable |
-
-
-# Downloads
-
-- [AppServices iApp](https://www.google.com)
-- [Weblogic VM with Agent IU Bundle](https://www.google.com)
-
-
-# Appendix
-
-Importing iApps into BIG-IP
-
-
-Go to BIG-IP -> iApps -> Template -> Import:
-
-Picture1.png
-
-Click “Choose File”
-
-Picture2.png
-
-After locate and select the iApps, click “Upload”
-
-Picture3.png
-
-Now the iApps is ready to be deployed through Cisco Cloud Center
+ 
+ 
